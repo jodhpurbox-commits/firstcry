@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: meesho-telegram-bot
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python meeshoshop_bot.py"
+    healthCheckPath: /healthz
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        value: "8709329900:AAFyAgNOqZRCzEUhTI1jEP3EyWcNMECPDjc"
+      - key: GRIZZLY_API_KEY
+        value: "804def05f9fa4a8469bf9704f1edfa73"
+      - key: MEESHO_CHECK_URL
+        value: "https://meeshoshop.94.136.188.137.nip.io/api/public/number-check"
+      - key: PYTHON_VERSION
+        value: "3.11.0"

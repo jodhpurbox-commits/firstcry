@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>FirstCry Smart Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #090c10;
+    --surface: #111620;
+    --card: rgba(22, 28, 42, 0.78);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-hover: rgba(30, 39, 58, 0.9);
+    --fg: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #ff6a00;
+    --accent-grad: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+    --cyan-grad: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    --gold: #f59e0b;
+    --gold-grad: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.2);
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    padding-bottom: 70px;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(255, 106, 0, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(58, 123, 213, 0.08) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* Header & Navigation */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(9, 12, 16, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 12px 16px;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--accent-grad);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(255, 106, 0, 0.35);
+  }
+
+  .brand-text h1 {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 40%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .brand-text p {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #34d399;
+  }
+
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.6; }
+  }
+
+  /* Segmented Nav */
+  .nav-bar {
+    display: flex;
+    gap: 6px;
+    background: rgba(17, 22, 32, 0.9);
+    padding: 4px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-btn.active {
+    background: var(--accent-grad);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255, 106, 0, 0.3);
+  }
+
+  /* Main Container */
+  .container {
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Glass Card */
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+  }
+
+  .card-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--accent-grad);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  /* Inputs & Forms */
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  
+  .field-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-box {
+    width: 100%;
+    background: rgba(10, 14, 22, 0.8);
+    border: 1px solid var(--card-border);
+    color: var(--fg);
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .input-box:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.18);
+    background: rgba(15, 20, 30, 0.95);
+  }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--accent-grad);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(255, 106, 0, 0.25);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn-outline {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--fg);
+    border: 1px solid var(--card-border);
+    box-shadow: none;
+  }
+
+  .btn-outline:hover, .btn-outline:active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 9px; }
+  .btn-block { width: 100%; }
+
+  .btn-glow {
+    background: var(--accent-grad);
+    box-shadow: 0 6px 20px rgba(255, 106, 0, 0.4);
+    font-size: 15px;
+    padding: 14px 20px;
+    border-radius: 14px;
+  }
+
+  /* Interactive Chips */
+  .chip-group {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--muted);
+    padding: 7px 13px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .chip.active {
+    background: var(--accent-grad);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(255, 106, 0, 0.3);
+  }
+
+  .chip.gold.active {
+    background: var(--gold-grad);
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Product Catalog Showcase */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .prod-card {
+    background: rgba(10, 14, 22, 0.7);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prod-card.selected {
+    background: rgba(255, 106, 0, 0.08);
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(255, 106, 0, 0.2);
+  }
+
+  .prod-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .prod-name {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    padding-right: 60px;
+  }
+
+  .prod-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .prod-price-box {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .curr-price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #34d399;
+  }
+
+  .mrp-price {
+    text-decoration: line-through;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  /* Stepper */
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(10, 14, 22, 0.9);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .step-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: var(--fg);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .step-val {
+    min-width: 26px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* Bill Summary */
+  .receipt {
+    background: rgba(10, 14, 22, 0.7);
+    border: 1px dashed var(--card-border);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+  }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 7px;
+    color: var(--muted);
+  }
+
+  .receipt-row.total {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    border-top: 1px dashed var(--card-border);
+    padding-top: 10px;
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+
+  .savings-pill {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #34d399;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* Success Modal */
+  .success-card {
+    display: none;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(10, 14, 22, 0.95) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    text-align: center;
+    margin-top: 16px;
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 2px solid #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto 12px;
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+  }
+
+  .order-code {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 14px;
+    border-radius: 8px;
+    margin: 10px 0;
+    color: #67e8f9;
+  }
+
+  /* Traffic Logs Explorer */
+  .log-search {
+    width: 100%;
+    background: rgba(17, 22, 32, 0.9);
+    border: 1px solid var(--card-border);
+    color: var(--fg);
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 10px;
+  }
+
+  .log-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .log-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  .log-hd:hover { background: rgba(255, 255, 255, 0.02); }
+  .log-title { font-size: 12px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .log-time { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .log-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0, 210, 255, 0.12);
+    color: #38bdf8;
+    margin-left: 8px;
+  }
+
+  .log-body {
+    display: none;
+    border-top: 1px solid var(--card-border);
+    padding: 10px 12px;
+    background: #090c10;
+  }
+
+  .log-body.open { display: block; }
+  
+  pre {
+    background: #06080b;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #e2e8f0;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .copy-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    color: #38bdf8;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">🍼</div>
+      <div class="brand-text">
+        <h1>FirstCry Assistant</h1>
+        <p>Smart Checkout & API Suite</p>
+      </div>
+    </div>
+    <div class="live-badge">
+      <div class="pulse-dot"></div>
+      <span>24/7 Cloud</span>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div id="navOrder" class="nav-btn active" onclick="setTab('order')">
+      <span>🛍️</span>
+      <span>Shop & Order</span>
+    </div>
+    <div id="navLogs" class="nav-btn" onclick="setTab('logs')">
+      <span>📊</span>
+      <span>Traffic Inspector</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ==================== TAB 1: SHOP & ORDER ==================== -->
+  <div id="paneOrder" class="tab-pane active">
+
+    <!-- Step 1: Account Authentication -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">
+          <div class="step-num">1</div>
+          <span>Account Authentication</span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">Mobile Number or Email</div>
+        <div class="row">
+          <input id="mobileInput" class="input-box" placeholder="e.g. 9876543210" value="9876543210" />
+          <button class="btn btn-sm btn-outline" onclick="sendOtp()">Send OTP</button>
+        </div>
+      </div>
+      <div id="otpBox" style="display:none;margin-top:10px">
+        <div class="row">
+          <input id="otpInput" class="input-box" placeholder="Enter 4-digit code" value="1234" />
+          <button class="btn btn-sm" onclick="confirmOtp()">Verify OTP</button>
+        </div>
+      </div>
+      <div id="authDone" style="display:none;margin-top:8px;font-size:12px;color:#34d399;font-weight:600">
+        ✨ Authenticated as <span id="authPhone">9876543210</span> (Active Session Verified)
+      </div>
+    </div>
+
+    <!-- Step 2: Child & Profile -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">
+          <div class="step-num">2</div>
+          <span>Child Profile Setup</span>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="generateSmartProfile()">🎲 Smart Roll</button>
+      </div>
+
+      <div class="row" style="margin-bottom:12px">
+        <div style="flex:1">
+          <div class="field-label">Child Name</div>
+          <input id="childName" class="input-box" value="Kabir" />
+        </div>
+        <div style="flex:1">
+          <div class="field-label">Date of Birth</div>
+          <input id="childDob" class="input-box" value="15/08/2024" />
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div class="field-label">Gender</div>
+          <div class="chip-group" id="genderChips">
+            <div class="chip active" onclick="pickGender(this, 'Boy')">👦 Boy</div>
+            <div class="chip" onclick="pickGender(this, 'Girl')">👧 Girl</div>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">VIP Club Member</div>
+          <div class="chip-group" id="clubChips">
+            <div class="chip gold active" onclick="pickClub(this, 'Yes')">👑 Club Member</div>
+            <div class="chip" onclick="pickClub(this, 'No')">Standard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Product Link & Catalog -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">
+          <div class="step-num">3</div>
+          <span>Product Link & Selection</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Paste Product URL or Product ID</div>
+        <div class="row">
+          <input id="urlInput" class="input-box" placeholder="https://www.firstcry.com/.../product-detail" />
+          <button class="btn btn-sm" onclick="importUrl()">⚡ Import</button>
+        </div>
+      </div>
+
+      <div class="field-label" style="margin-top:14px">Or Select Popular Item:</div>
+      <div class="prod-grid" id="prodGrid"></div>
+
+      <!-- Qty & Size -->
+      <div class="row" style="margin-top:14px;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="field-label">Quantity</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="stepQty(-1)">-</button>
+            <div class="step-val" id="qtyText">1</div>
+            <button class="step-btn" onclick="stepQty(1)">+</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="field-label">Select Size</div>
+          <div class="chip-group" id="sizeChips">
+            <div class="chip" onclick="pickSize(this, '0-6M')">0-6M</div>
+            <div class="chip active" onclick="pickSize(this, '6-12M')">6-12M</div>
+            <div class="chip" onclick="pickSize(this, '12-24M')">12-24M</div>
+            <div class="chip" onclick="pickSize(this, 'Standard')">Standard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Shipping Address -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">
+          <div class="step-num">4</div>
+          <span>Delivery Address</span>
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div style="flex:1">
+          <div class="field-label">Recipient Name</div>
+          <input id="addrName" class="input-box" value="John Doe" />
+        </div>
+        <div style="flex:1">
+          <div class="field-label">Pincode</div>
+          <input id="addrPin" class="input-box" value="342801" oninput="calculateTotal()" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Flat / House / Street Address</div>
+        <input id="addrLine" class="input-box" value="Flat 402, Sunshine Heights, Main Road, LUNI, Rajasthan" />
+      </div>
+    </div>
+
+    <!-- Step 5: Payment & Order Review -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">
+          <div class="step-num">5</div>
+          <span>Payment & Order Summary</span>
+        </div>
+      </div>
+
+      <div class="field-label">Payment Mode</div>
+      <div class="chip-group" id="payChips" style="margin-bottom:12px">
+        <div class="chip active" onclick="pickPay(this, 'Cash on Delivery')">💵 Cash on Delivery</div>
+        <div class="chip" onclick="pickPay(this, 'UPI')">⚡ Instant UPI (GPay/PhonePe)</div>
+        <div class="chip" onclick="pickPay(this, 'Card')">💳 Credit / Debit Card</div>
+      </div>
+
+      <div class="savings-pill">
+        🎉 You save <b id="savingsAmount">Rs. 260.81</b> with Club Exclusive pricing!
+      </div>
+
+      <div class="receipt">
+        <div class="receipt-row">
+          <span>Item (<span id="receiptQty">1</span>x <span id="receiptItem">Sneakers</span>):</span>
+          <span id="receiptItemPrice">Rs. 1138.19</span>
+        </div>
+        <div class="receipt-row">
+          <span>Express Delivery:</span>
+          <span style="color:#34d399">FREE (Rs. 0.00)</span>
+        </div>
+        <div class="receipt-row">
+          <span>Estimated Taxes (GST):</span>
+          <span>Included</span>
+        </div>
+        <div class="receipt-row total">
+          <span>Grand Total:</span>
+          <span style="color:#34d399" id="receiptGrandTotal">Rs. 1138.19</span>
+        </div>
+      </div>
+
+      <button class="btn btn-glow btn-block" onclick="submitOrder()">
+        <span>🛍️ Place Order Now</span>
+      </button>
+    </div>
+
+    <!-- Success Celebration Modal -->
+    <div id="successCard" class="success-card">
+      <div class="success-icon">🎉</div>
+      <h2 style="font-size:18px;font-weight:800;color:#34d399">Order Placed Successfully!</h2>
+      <p style="font-size:12px;color:var(--muted);margin-top:4px">Your FirstCry order has been confirmed & scheduled for dispatch.</p>
+      <div class="order-code" id="finalOrderId">FC178757990142</div>
+      <div style="font-size:13px;font-weight:700;margin:6px 0">
+        Amount Paid: <span style="color:#34d399" id="finalAmount">Rs. 1138.19</span> (<span id="finalPayMode">COD</span>)
+      </div>
+      <p style="font-size:11px;color:var(--muted)">Tracking link and confirmation SMS sent to your mobile.</p>
+      <button class="btn btn-outline btn-sm" style="margin-top:14px" onclick="resetFlow()">🛍️ Order Another Product</button>
+    </div>
+
+  </div>
+
+  <!-- ==================== TAB 2: TRAFFIC INSPECTOR ==================== -->
+  <div id="paneLogs" class="tab-pane">
+    <input id="logSearchInput" class="log-search" placeholder="🔍 Search requests, tokens, parameters, payloads..." />
+    <div class="chip-group" id="logFilterChips" style="margin-bottom:12px"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between">
+      <span id="logStatsText">Loading stream data...</span>
+    </div>
+    <div id="logList"></div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  const TG = window.Telegram && window.Telegram.WebApp;
+  if(TG){
+    try {
+      TG.ready();
+      TG.expand();
+      if(TG.themeParams && TG.themeParams.bg_color){
+        document.documentElement.style.setProperty('--bg', TG.themeParams.bg_color);
+      }
+    } catch(e){}
+  }
+
+  function triggerHaptic(type){
+    if(TG && TG.HapticFeedback){
+      if(type==='success') TG.HapticFeedback.notificationOccurred('success');
+      else TG.HapticFeedback.impactOccurred('light');
+    }
+  }
+
+  /* Tab Navigation */
+  window.setTab = function(tab){
+    document.getElementById('navOrder').classList.toggle('active', tab==='order');
+    document.getElementById('navLogs').classList.toggle('active', tab==='logs');
+    document.getElementById('paneOrder').classList.toggle('active', tab==='order');
+    document.getElementById('paneLogs').classList.toggle('active', tab==='logs');
+    triggerHaptic('light');
+  };
+
+  /* Products Data */
+  const CATALOG = [
+    {id: 23883178, title: "Babyoye Velcro Closure Sneakers", brand: "Babyoye", price: 1138.19, mrp: 1399.00, discount: "19% OFF", tag: "BESTSELLER"},
+    {id: 10009124, title: "Babyhug Cotton Romper Suit Blue", brand: "Babyhug", price: 649.00, mrp: 899.00, discount: "28% OFF", tag: "TRENDING"},
+    {id: 14589201, title: "Pampers All-Round Diapers (64pc)", brand: "Pampers", price: 899.00, mrp: 1199.00, discount: "25% OFF", tag: "ESSENTIAL"},
+    {id: 18239012, title: "Himalaya Gentle Baby Bath (400ml)", brand: "Himalaya", price: 380.00, mrp: 450.00, discount: "15% OFF", tag: "POPULAR"}
+  ];
+
+  let selectedProd = CATALOG[0];
+  let qty = 1;
+  let size = "6-12M";
+  let gender = "Boy";
+  let club = "Yes";
+  let payMode = "Cash on Delivery";
+
+  function renderCatalog(){
+    const el = document.getElementById('prodGrid');
+    el.innerHTML = '';
+    CATALOG.forEach(p => {
+      const isSel = (p.id === selectedProd.id);
+      const card = document.createElement('div');
+      card.className = 'prod-card' + (isSel ? ' selected' : '');
+      card.innerHTML = `
+        <div class="prod-badge">${p.discount}</div>
+        <div class="prod-name">${p.title}</div>
+        <div class="prod-meta">
+          <span>${p.brand} · ${p.tag}</span>
+          <div class="prod-price-box">
+            <span class="curr-price">Rs. ${p.price.toFixed(2)}</span>
+            <span class="mrp-price">Rs. ${p.mrp.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+      card.onclick = () => {
+        selectedProd = p;
+        renderCatalog();
+        calculateTotal();
+        triggerHaptic('light');
+      };
+      el.appendChild(card);
+    });
+  }
+
+  window.importUrl = function(){
+    const input = document.getElementById('urlInput').value.trim();
+    if(!input){ alert("Please enter a FirstCry product URL or ID"); return; }
+    
+    let pid = 23883178;
+    const match = input.match(/\/(\d{5,10})(?:\/product-detail|\?|$|\/)/) || input.match(/\b(\d{6,9})\b/);
+    if(match) pid = parseInt(match[1]);
+
+    const slug = input.match(/\/([^\/]+)\/\d{5,10}\/product-detail/);
+    const title = slug ? slug[1].replace(/-/g,' ').toUpperCase().slice(0, 45) : `FirstCry Item #${pid}`;
+
+    selectedProd = {
+      id: pid,
+      title: title,
+      brand: "FirstCry Verified",
+      price: 899.00,
+      mrp: 1199.00,
+      discount: "25% OFF",
+      tag: "IMPORTED"
+    };
+
+    if(!CATALOG.find(x => x.id === pid)) CATALOG.unshift(selectedProd);
+    renderCatalog();
+    calculateTotal();
+    triggerHaptic('success');
+  };
+
+  window.stepQty = function(d){
+    qty = Math.max(1, Math.min(10, qty + d));
+    document.getElementById('qtyText').textContent = qty;
+    calculateTotal();
+    triggerHaptic('light');
+  };
+
+  window.pickSize = function(btn, s){
+    size = s;
+    document.querySelectorAll('#sizeChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    triggerHaptic('light');
+  };
+
+  window.pickGender = function(btn, g){
+    gender = g;
+    document.querySelectorAll('#genderChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  window.pickClub = function(btn, c){
+    club = c;
+    document.querySelectorAll('#clubChips .chip').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    calculateTotal();
+  };
+
+  window.pickPay = function(btn, p){
+    payMode = p;
+    document.querySelectorAll('#payChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    triggerHaptic('light');
+  };
+
+  window.generateSmartProfile = function(){
+    const boys = ["Aarav", "Reyansh", "Vihaan", "Kabir", "Advaith"];
+    const girls = ["Ananya", "Diya", "Isha", "Navya", "Riya"];
+    const isBoy = Math.random() > 0.5;
+    const name = (isBoy ? boys : girls)[Math.floor(Math.random() * 5)];
+    document.getElementById('childName').value = name;
+    document.getElementById('childDob').value = "15/08/2024";
+    pickGender(document.querySelectorAll('#genderChips .chip')[isBoy ? 0 : 1], isBoy ? 'Boy' : 'Girl');
+    triggerHaptic('success');
+  };
+
+  window.sendOtp = function(){
+    document.getElementById('otpBox').style.display = 'block';
+    triggerHaptic('light');
+  };
+
+  window.confirmOtp = function(){
+    const phone = document.getElementById('mobileInput').value.trim() || '9876543210';
+    document.getElementById('authPhone').textContent = phone;
+    document.getElementById('authDone').style.display = 'block';
+    document.getElementById('otpBox').style.display = 'none';
+    triggerHaptic('success');
+  };
+
+  function calculateTotal(){
+    const subtotal = selectedProd.price * qty;
+    const savings = (selectedProd.mrp - selectedProd.price) * qty;
+
+    document.getElementById('savingsAmount').textContent = `Rs. ${savings.toFixed(2)}`;
+    document.getElementById('receiptQty').textContent = qty;
+    document.getElementById('receiptItem').textContent = selectedProd.title;
+    document.getElementById('receiptItemPrice').textContent = `Rs. ${subtotal.toFixed(2)}`;
+    document.getElementById('receiptGrandTotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
+  }
+
+  window.submitOrder = function(){
+    const orderId = `FC${Date.now().toString().slice(-8)}${Math.floor(1000 + Math.random() * 9000)}`;
+    const total = (selectedProd.price * qty).toFixed(2);
+
+    document.getElementById('finalOrderId').textContent = orderId;
+    document.getElementById('finalAmount').textContent = `Rs. ${total}`;
+    document.getElementById('finalPayMode').textContent = payMode;
+
+    const modal = document.getElementById('successCard');
+    modal.style.display = 'block';
+    modal.scrollIntoView({ behavior: 'smooth' });
+    triggerHaptic('success');
+
+    // Transmit order payload to Telegram Bot if inside Telegram WebApp
+    if (TG && typeof TG.sendData === 'function') {
+      try {
+        TG.sendData(JSON.stringify({
+          orderId: orderId,
+          productTitle: selectedProd.title,
+          productId: selectedProd.id,
+          quantity: qty,
+          size: size,
+          total: total,
+          payMode: payMode,
+          recipient: document.getElementById('addrName').value,
+          pincode: document.getElementById('addrPin').value
+        }));
+      } catch(e) {
+        console.warn('TG.sendData notice:', e);
+      }
+    }
+  };
+
+  window.resetFlow = function(){
+    document.getElementById('successCard').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  renderCatalog();
+  calculateTotal();
+
+  /* ================= TRAFFIC VIEWER ================= */
+  const FLOWS = ["all", "signup", "register", "login", "order", "cart", "checkout", "payment", "otp", "address"];
+  let ENTRIES = [];
+  let currentFilter = "all";
+  let query = "";
+
+  function renderFilterChips(){
+    const el = document.getElementById('logFilterChips');
+    el.innerHTML = '';
+    FLOWS.forEach(f => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (f === currentFilter ? ' active' : '');
+      chip.textContent = f.toUpperCase();
+      chip.onclick = () => {
+        currentFilter = f;
+        renderFilterChips();
+        applyLogs();
+      };
+      el.appendChild(chip);
+    });
+  }
+
+  function parseTraffic(raw){
+    const items = [];
+    const blocks = raw.split(/\n={20,}\s*\n/);
+    for(const b of blocks){
+      if(!b.trim()) continue;
+      const strM = b.match(/STREAM:\s*([^\n]+)/);
+      const timeM = b.match(/TIME:\s*([^\n]+)/);
+      const str = strM ? strM[1].trim() : "";
+      const time = timeM ? timeM[1].trim() : "Recent";
+      const rb = b.match(/\[REQUEST BODY\][\s\S]*?(\n\[RESPONSE BODY|$)/);
+      const req = rb ? rb[0].replace(/\[REQUEST BODY\]/,'').replace(/\n\[RESPONSE BODY$/,'').trim() : '';
+      const resM = b.match(/\[RESPONSE BODY(?: \(decoded\))?\][\s\S]*$/);
+      const res = resM ? resM[0].replace(/\[RESPONSE BODY(?: \(decoded\))?\]/,'').trim() : '';
+
+      const tags = FLOWS.filter(f => f!=='all' && (req+' '+res+' '+str).toLowerCase().includes(f));
+      items.push({ str, time, req, res, tag: tags[0] || 'API' });
+    }
+    return items;
+  }
+
+  function createCard(item){
+    const card = document.createElement('div');
+    card.className = 'log-card';
+    const preview = (item.req || item.res || item.str || '').slice(0, 80).replace(/\s+/g, ' ');
+
+    card.innerHTML = `
+      <div class="log-hd">
+        <div style="flex:1;overflow:hidden">
+          <div class="log-title">${preview}</div>
+          <div class="log-time">${item.time} · ${item.str}</div>
+        </div>
+        <div class="log-tag">${item.tag}</div>
+      </div>
+      <div class="log-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:10px;color:var(--muted);font-weight:700">REQUEST PAYLOAD</span>
+          <button class="copy-btn copy-req">Copy</button>
+        </div>
+        <pre class="pre-req">${item.req || '(empty)'}</pre>
+        <div style="display:flex;justify-content:space-between;margin:8px 0 4px">
+          <span style="font-size:10px;color:var(--muted);font-weight:700">RESPONSE PAYLOAD</span>
+          <button class="copy-btn copy-res">Copy</button>
+        </div>
+        <pre class="pre-res">${item.res || '(empty)'}</pre>
+      </div>
+    `;
+
+    const hd = card.querySelector('.log-hd');
+    const body = card.querySelector('.log-body');
+    hd.onclick = () => body.classList.toggle('open');
+
+    card.querySelector('.copy-req').onclick = (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(item.req);
+      e.target.textContent = 'Copied!';
+      setTimeout(()=>e.target.textContent='Copy', 1200);
+    };
+
+    card.querySelector('.copy-res').onclick = (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(item.res);
+      e.target.textContent = 'Copied!';
+      setTimeout(()=>e.target.textContent='Copy', 1200);
+    };
+
+    return card;
+  }
+
+  function applyLogs(){
+    const filtered = ENTRIES.filter(e => {
+      if(currentFilter !== 'all' && e.tag.toLowerCase() !== currentFilter) return false;
+      if(query && !((e.req+' '+e.res+' '+e.str).toLowerCase().includes(query))) return false;
+      return true;
+    });
+
+    document.getElementById('logStatsText').textContent = `${filtered.length} / ${ENTRIES.length} Stream Requests`;
+    const list = document.getElementById('logList');
+    list.innerHTML = '';
+
+    const slice = filtered.slice(0, 40);
+    slice.forEach(item => list.appendChild(createCard(item)));
+  }
+
+  document.getElementById('logSearchInput').oninput = (e) => {
+    query = e.target.value.trim().toLowerCase();
+    applyLogs();
+  };
+
+  renderFilterChips();
+
+  fetch('firstcry_session.txt', { cache: 'no-store' })
+    .then(r => r.text())
+    .then(txt => {
+      ENTRIES = parseTraffic(txt);
+      applyLogs();
+    })
+    .catch(() => {
+      document.getElementById('logStatsText').textContent = 'Live Mode Active (Ready)';
+    });
+
+})();
+</script>
+</body>
+</html>

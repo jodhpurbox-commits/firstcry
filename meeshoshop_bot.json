@@ -1,0 +1,13 @@
+{
+  "bot_token": "8709329900:AAFyAgNOqZRCzEUhTI1jEP3EyWcNMECPDjc",
+  "allowed_users": [],
+  "grizzly_api_key": "804def05f9fa4a8469bf9704f1edfa73",
+  "grizzly_base": "https://api.grizzlysms.com/stubs/handler_api.php",
+  "meesho_check": "https://meeshoshop.94.136.188.137.nip.io/api/public/number-check",
+  "service": "hp",
+  "country": 22,
+  "max_price": "",
+  "poll_interval": 1.5,
+  "otp_timeout": 150,
+  "workers": 4
+}
